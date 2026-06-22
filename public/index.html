@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PixelCritic - Plataforma editorial de reseñas de videojuegos. Explora el catálogo completo de títulos gestionados por el Equipo Tecno Capibara.">
+  <title>Catálogo - PixelCritic</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-on-surface": "#313030",
+            "on-surface": "#e5e2e1",
+            "on-primary-fixed": "#2c0051",
+            "primary-fixed": "#f0dbff",
+            "surface-container": "#201f1f",
+            "on-tertiary-fixed-variant": "#474747",
+            "secondary-fixed-dim": "#4ae176",
+            "secondary-container": "#00b954",
+            "on-tertiary-container": "#2a2a2a",
+            "on-secondary": "#003915",
+            "inverse-surface": "#e5e2e1",
+            "on-tertiary-fixed": "#1b1b1b",
+            "primary-container": "#b76dff",
+            "on-secondary-fixed": "#002109",
+            "on-error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#c6c6c6",
+            "error": "#ffb4ab",
+            "tertiary-container": "#919191",
+            "primary-fixed-dim": "#ddb7ff",
+            "outline": "#988d9f",
+            "outline-variant": "#4d4354",
+            "on-secondary-fixed-variant": "#005321",
+            "inverse-primary": "#842bd2",
+            "secondary": "#4ae176",
+            "surface-container-low": "#1c1b1b",
+            "on-primary-fixed-variant": "#6900b3",
+            "on-primary": "#490080",
+            "on-tertiary": "#303030",
+            "secondary-fixed": "#6bff8f",
+            "surface-tint": "#ddb7ff",
+            "surface": "#131313",
+            "error-container": "#93000a",
+            "on-error": "#690005",
+            "surface-container-lowest": "#0e0e0e",
+            "surface-container-highest": "#353534",
+            "on-surface-variant": "#cfc2d6",
+            "on-secondary-container": "#004119",
+            "primary": "#ddb7ff",
+            "surface-bright": "#393939",
+            "surface-variant": "#353534",
+            "tertiary": "#c6c6c6",
+            "on-primary-container": "#400071",
+            "tertiary-fixed": "#e2e2e2",
+            "on-background": "#e5e2e1",
+            "surface-container-high": "#2a2a2a",
+            "surface-dim": "#131313",
+            "background": "#131313"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "xl": "80px", "lg": "48px", "xs": "4px",
+            "gutter": "24px", "sm": "12px", "base": "8px",
+            "container-max": "1280px", "md": "24px"
+          },
+          fontFamily: {
+            "body-md": ["Inter"], "label-sm": ["JetBrains Mono"],
+            "headline-lg": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"],
+            "display-lg": ["Space Grotesk"], "headline-md": ["Space Grotesk"],
+            "body-lg": ["Inter"]
+          },
+          fontSize: {
+            "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+            "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+            "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "600"}],
+            "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+            "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-panel {
+      background: rgba(28, 27, 27, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(77, 67, 84, 0.3);
+    }
+    .game-card {
+      background: rgba(28, 27, 27, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(77, 67, 84, 0.2);
+      transition: all 0.3s ease;
+    }
+    .game-card:hover {
+      border-color: #ddb7ff;
+      box-shadow: 0 0 24px rgba(221, 183, 255, 0.25);
+      transform: translateY(-2px);
+    }
+    .input-cyber {
+      background-color: #000000;
+      border: none;
+      border-bottom: 2px solid #4d4354;
+      transition: all 0.3s ease;
+    }
+    .input-cyber:focus {
+      outline: none;
+      border-bottom-color: #ddb7ff;
+      box-shadow: 0 10px 10px -10px rgba(221, 183, 255, 0.5);
+    }
+    .nav-active {
+      background: #b76dff;
+      color: #400071;
+    }
+    .ambient-glow-1 {
+      position: fixed; top: -200px; left: 30%; width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(183,109,255,0.12) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    .ambient-glow-2 {
+      position: fixed; bottom: -200px; right: 10%; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(74,225,118,0.08) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    @keyframes slideInUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .toast-animate { animation: slideInUp 0.3s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-show { animation: fadeIn 0.25s ease-out forwards; }
+    .star-rating { color: #4ae176; }
+    .filter-btn.active {
+      background: rgba(183,109,255,0.15);
+      color: #ddb7ff;
+      border-color: rgba(183,109,255,0.5);
+    }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+
+  <!-- Ambient background glows -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- ── Side Navigation ── -->
+  <nav id="sideNav" class="fixed left-0 top-0 h-screen w-64 z-40 bg-surface-container-low/90 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col py-md transition-transform duration-300 -translate-x-full md:translate-x-0">
+    <div class="px-gutter mb-lg">
+      <h1 class="text-headline-md font-headline-md font-bold text-primary tracking-tight">PixelCritic</h1>
+      <p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">Gamer Editorial</p>
+    </div>
+    <div class="flex-1 flex flex-col gap-2 px-2">
+      <a href="index.html" id="nav-catalogo" class="nav-link flex items-center gap-4 nav-active rounded-full px-4 py-3 transition-all duration-300">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+        <span class="text-label-sm font-label-sm">Catálogo</span>
+      </a>
+      <a href="admin.html" class="nav-link flex items-center gap-4 text-on-surface-variant hover:text-on-surface rounded-full px-4 py-3 hover:bg-surface-variant/50 transition-all duration-300">
+        <span class="material-symbols-outlined">settings_applications</span>
+        <span class="text-label-sm font-label-sm">Administración</span>
+      </a>
+      <a href="premium.html" class="nav-link flex items-center gap-4 text-on-surface-variant hover:text-on-surface rounded-full px-4 py-3 hover:bg-surface-variant/50 transition-all duration-300">
+        <span class="material-symbols-outlined">workspace_premium</span>
+        <span class="text-label-sm font-label-sm">Favoritos del Equipo</span>
+      </a>
+    </div>
+    <div class="px-gutter mt-auto flex items-center gap-sm">
+      <div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center border border-outline-variant overflow-hidden">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1; font-size:28px;">account_circle</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-label-sm font-label-sm text-on-surface">Tecno Capibara</span>
+        <span class="text-xs text-secondary font-label-sm">● Online</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Top Bar ── -->
+  <header class="fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center h-20 px-gutter md:ml-64">
+    <div class="flex items-center gap-sm">
+      <button onclick="toggleNav()" class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <span class="text-headline-md font-headline-md font-black text-primary md:hidden">PixelCritic</span>
+    </div>
+    <div class="hidden md:flex flex-1 max-w-md focus-within:ring-2 focus-within:ring-secondary/50 rounded-full bg-surface-container-low px-4 py-2 items-center gap-2 border border-outline-variant/50">
+      <span class="material-symbols-outlined text-on-surface-variant text-xl">search</span>
+      <input id="searchInput" class="bg-transparent border-none text-body-md font-body-md text-on-surface placeholder-on-surface-variant focus:ring-0 w-full outline-none" placeholder="Buscar juegos..." type="text" oninput="filterCards()">
+    </div>
+    <div class="flex items-center gap-md ml-auto">
+      <button class="text-on-surface-variant hover:text-primary transition-colors relative">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
+      </button>
+      <button class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">account_circle</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main Content ── -->
+  <main class="relative z-10 pt-24 pb-16 md:ml-64 px-4 md:px-gutter min-h-screen">
+
+    <!-- Page header -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-md mb-xl">
+      <div>
+        <p class="text-label-sm font-label-sm text-secondary uppercase tracking-widest mb-2">PixelCriticDB</p>
+        <h2 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface tracking-tight mb-xs">Catálogo Central</h2>
+        <p class="text-body-md font-body-md text-on-surface-variant max-w-2xl">Gestiona la base de datos de títulos editoriales. Añade, revisa y clasifica los juegos del equipo.</p>
+      </div>
+      <button onclick="openModal()" class="flex items-center gap-2 bg-primary text-on-primary-fixed hover:bg-primary-container px-6 py-3 rounded-lg font-label-sm text-label-sm uppercase transition-all duration-300 shadow-[0_0_20px_rgba(221,183,255,0.25)] hover:shadow-[0_0_30px_rgba(221,183,255,0.5)] border border-primary/30 shrink-0">
+        <span class="material-symbols-outlined">add_circle</span>
+        Añadir Juego
+      </button>
+    </div>
+
+    <!-- Filters bar -->
+    <div class="glass-panel rounded-xl p-4 mb-lg flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div id="filterBtns" class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+        <button onclick="setFilter('Todos', this)" class="filter-btn active px-4 py-1.5 rounded-full text-label-sm font-label-sm border border-outline-variant/50 whitespace-nowrap transition-colors">Todos</button>
+        <button onclick="setFilter('Aventura', this)" class="filter-btn px-4 py-1.5 rounded-full text-label-sm font-label-sm text-on-surface-variant border border-outline-variant/50 whitespace-nowrap transition-colors hover:text-on-surface">Aventura</button>
+        <button onclick="setFilter('Accion', this)" class="filter-btn px-4 py-1.5 rounded-full text-label-sm font-label-sm text-on-surface-variant border border-outline-variant/50 whitespace-nowrap transition-colors hover:text-on-surface">Acción</button>
+        <button onclick="setFilter('Deportes', this)" class="filter-btn px-4 py-1.5 rounded-full text-label-sm font-label-sm text-on-surface-variant border border-outline-variant/50 whitespace-nowrap transition-colors hover:text-on-surface">Deportes</button>
+        <button onclick="setFilter('RPG', this)" class="filter-btn px-4 py-1.5 rounded-full text-label-sm font-label-sm text-on-surface-variant border border-outline-variant/50 whitespace-nowrap transition-colors hover:text-on-surface">RPG</button>
+      </div>
+      <div class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant whitespace-nowrap">
+        <span class="material-symbols-outlined text-sm">sort</span>
+        <span>Ordenar: <span class="text-primary cursor-pointer" onclick="toggleSort()">Precio <span id="sortIcon">↓</span></span></span>
+      </div>
+    </div>
+
+    <!-- Game cards grid -->
+    <div id="gameGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <!-- Cards are rendered by JS -->
+    </div>
+
+    <div id="emptyState" class="hidden text-center py-20 text-on-surface-variant">
+      <span class="material-symbols-outlined text-6xl opacity-30 block mb-4">search_off</span>
+      <p class="text-body-lg font-body-lg">No se encontraron juegos con ese filtro.</p>
+    </div>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="relative z-10 bg-surface-container-lowest md:ml-64 py-base border-t border-outline-variant/20 flex flex-wrap justify-between items-center gap-4 px-gutter">
+    <span class="text-label-sm font-label-sm font-bold text-primary">PixelCritic</span>
+    <div class="flex gap-4">
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors" href="#">Términos</a>
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors" href="#">Privacidad</a>
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors" href="#">Contacto</a>
+    </div>
+    <span class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hidden md:block">Desarrollado por el Grupo Tecno Capibara</span>
+  </footer>
+
+  <!-- ── Add Game Modal ── -->
+  <div id="addGameModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="glass-panel modal-show relative w-full max-w-lg rounded-2xl shadow-2xl border border-primary/20 flex flex-col max-h-[90vh] overflow-hidden">
+      <div class="p-md border-b border-outline-variant/30 flex justify-between items-center bg-surface-container/50">
+        <h3 class="text-headline-md font-headline-md text-primary font-bold tracking-tight">Nuevo Ingreso</h3>
+        <button onclick="closeModal()" class="text-on-surface-variant hover:text-error transition-colors w-8 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="addGameForm" class="p-md overflow-y-auto flex flex-col gap-6" onsubmit="handleFormSubmit(event)">
+        <div class="flex flex-col gap-1">
+          <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Título del Juego *</label>
+          <input id="newTitle" class="input-cyber w-full py-2 text-body-md font-body-md text-on-surface" placeholder="Ej. The Legend of Capibara" required type="text">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Precio (USD) *</label>
+            <div class="relative">
+              <span class="absolute left-0 top-2 text-on-surface-variant text-sm">$</span>
+              <input id="newPrice" class="input-cyber w-full py-2 pl-4 text-body-md font-body-md text-secondary" placeholder="59.99" required step="0.01" min="0" type="number">
+            </div>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Año de Lanzamiento *</label>
+            <input id="newYear" class="input-cyber w-full py-2 text-body-md font-body-md text-on-surface" max="2030" min="1980" placeholder="2025" required type="number">
+          </div>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Categoría *</label>
+          <select id="newCat" class="input-cyber w-full py-2 text-body-md font-body-md text-on-surface bg-transparent appearance-none cursor-pointer" required>
+            <option disabled selected value="">Selecciona un género...</option>
+            <option value="RPG">RPG</option>
+            <option value="Accion">Acción</option>
+            <option value="Aventura">Aventura</option>
+            <option value="Deportes">Deportes</option>
+            <option value="Estrategia">Estrategia</option>
+            <option value="Shooter">Shooter</option>
+          </select>
+        </div>
+        <div class="mt-2 flex justify-end gap-4 border-t border-outline-variant/30 pt-6">
+          <button type="button" onclick="closeModal()" class="px-6 py-2 border border-secondary text-secondary rounded-lg font-label-sm text-label-sm uppercase hover:bg-secondary/10 transition-colors">Cancelar</button>
+          <button id="submitBtn" type="submit" class="bg-primary text-on-primary-fixed hover:bg-primary-container px-6 py-2 rounded-lg font-label-sm text-label-sm uppercase transition-all duration-300 shadow-[0_0_15px_rgba(221,183,255,0.2)] hover:shadow-[0_0_25px_rgba(221,183,255,0.5)]">Guardar Título</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Toast Container ── -->
+  <div id="toastContainer" class="fixed bottom-6 right-4 md:right-gutter z-[110] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ── Mobile Nav Overlay ── -->
+  <div id="navOverlay" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden" onclick="toggleNav()"></div>
+
+  <script>
+    // ── Game Data (from PixelCriticDB) ──
+    const categoryIcons = {
+      'RPG': 'auto_stories', 'Accion': 'local_fire_department',
+      'Aventura': 'explore', 'Deportes': 'sports_soccer',
+      'Estrategia': 'psychology', 'Shooter': 'target'
+    };
+    const categoryColors = {
+      'RPG': '#ddb7ff', 'Accion': '#ff8a65', 'Aventura': '#4ae176',
+      'Deportes': '#64b5f6', 'Estrategia': '#ffd54f', 'Shooter': '#ef5350'
+    };
+
+    let games = [
+      { id: 1, titulo: "The Legend of Capibara", precio: 19.99, categoria: "Aventura", anioLanzamiento: 2025, calificacion: 5.0, desarrolladora: "Capibara Studios" },
+      { id: 2, titulo: "Grand Theft Auto VI", precio: 69.99, categoria: "Accion", anioLanzamiento: 2025, calificacion: 5.0, desarrolladora: "Rockstar" },
+      { id: 3, titulo: "EAFC 26", precio: 59.99, categoria: "Deportes", anioLanzamiento: 2026, calificacion: 3.0, desarrolladora: "Epic Games" },
+      { id: 4, titulo: "Final Fantasy XVII", precio: 79.99, categoria: "RPG", anioLanzamiento: 2026, calificacion: 4.0, desarrolladora: "Capibara Studios" },
+    ];
+
+    let currentFilter = 'Todos';
+    let sortAsc = false;
+    let searchTerm = '';
+
+    const coverImages = {
+      'Aventura': 'https://images.unsplash.com/photo-1518791841217-8f162f1912da?w=400&h=220&fit=crop',
+      'Accion': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=220&fit=crop',
+      'Deportes': 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=220&fit=crop',
+      'RPG': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=220&fit=crop',
+      'Estrategia': 'https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=400&h=220&fit=crop',
+      'Shooter': 'https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=400&h=220&fit=crop',
+    };
+
+    function getStars(rating) {
+      const full = Math.round(rating);
+      return Array.from({length: 5}, (_, i) =>
+        `<span class="material-symbols-outlined text-sm ${i < full ? 'text-secondary' : 'text-outline-variant'}" style="font-variation-settings:'FILL' ${i < full ? 1 : 0};">star</span>`
+      ).join('');
+    }
+
+    function renderGames() {
+      const grid = document.getElementById('gameGrid');
+      const empty = document.getElementById('emptyState');
+      let filtered = games.filter(g => {
+        const matchFilter = currentFilter === 'Todos' || g.categoria === currentFilter;
+        const matchSearch = g.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            g.categoria.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchFilter && matchSearch;
+      });
+      filtered.sort((a, b) => sortAsc ? a.precio - b.precio : b.precio - a.precio);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      grid.innerHTML = filtered.map(g => `
+        <div class="game-card rounded-2xl overflow-hidden group cursor-pointer flex flex-col h-full relative" id="card-${g.id}">
+          <div class="absolute top-3 right-3 z-10 bg-surface/80 backdrop-blur-md border border-outline-variant/50 px-2 py-1 rounded-lg text-label-sm font-label-sm text-secondary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1;">star</span>
+            ${g.calificacion.toFixed(1)}
+          </div>
+          <div class="h-48 w-full relative overflow-hidden bg-surface-container-high">
+            <img alt="Portada de ${g.titulo}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              src="${coverImages[g.categoria] || 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&h=220&fit=crop'}"
+              onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center h-full\'><span class=\'material-symbols-outlined text-5xl text-outline-variant\'>sports_esports</span></div>'">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#131313] to-transparent"></div>
+          </div>
+          <div class="p-md flex-1 flex flex-col">
+            <div class="flex justify-between items-start mb-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-label-sm uppercase tracking-wider border" style="background:${categoryColors[g.categoria] || '#ddb7ff'}18; color:${categoryColors[g.categoria] || '#ddb7ff'}; border-color:${categoryColors[g.categoria] || '#ddb7ff'}30">
+                ${g.categoria}
+              </span>
+              <span class="text-on-surface-variant text-label-sm font-label-sm">${g.anioLanzamiento}</span>
+            </div>
+            <h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors leading-tight">${g.titulo}</h3>
+            <p class="text-xs text-on-surface-variant font-label-sm mb-2">${g.desarrolladora}</p>
+            <div class="flex items-center gap-1 mb-3">${getStars(g.calificacion)}</div>
+            <div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+              <span class="text-body-lg font-body-lg font-semibold text-secondary">$${g.precio.toFixed(2)}</span>
+              <div class="flex gap-2">
+                <button onclick="editGame(${g.id})" class="text-on-surface-variant hover:text-primary transition-colors p-1 rounded" title="Editar precio">
+                  <span class="material-symbols-outlined text-lg">edit</span>
+                </button>
+                <button onclick="deleteGame(${g.id})" class="text-on-surface-variant hover:text-error transition-colors p-1 rounded" title="Eliminar">
+                  <span class="material-symbols-outlined text-lg">delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setFilter(cat, btn) {
+      currentFilter = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGames();
+    }
+
+    function filterCards() {
+      searchTerm = document.getElementById('searchInput').value;
+      renderGames();
+    }
+
+    function toggleSort() {
+      sortAsc = !sortAsc;
+      document.getElementById('sortIcon').textContent = sortAsc ? '↑' : '↓';
+      renderGames();
+    }
+
+    // ── Modal ──
+    function openModal() {
+      const modal = document.getElementById('addGameModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    function closeModal() {
+      const modal = document.getElementById('addGameModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.getElementById('addGameForm').reset();
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm inline-block">sync</span> Procesando...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const newGame = {
+          id: Date.now(),
+          titulo: document.getElementById('newTitle').value,
+          precio: parseFloat(document.getElementById('newPrice').value),
+          categoria: document.getElementById('newCat').value,
+          anioLanzamiento: parseInt(document.getElementById('newYear').value),
+          calificacion: 0,
+          desarrolladora: "Nuevo Estudio"
+        };
+        games.push(newGame);
+        renderGames();
+        closeModal();
+        showToast(`"${newGame.titulo}" añadido al catálogo.`);
+        btn.innerHTML = 'Guardar Título';
+        btn.disabled = false;
+      }, 600);
+    }
+
+    function editGame(id) {
+      const game = games.find(g => g.id === id);
+      if (!game) return;
+      const newPrice = prompt(`Nuevo precio para "${game.titulo}" (actual: $${game.precio.toFixed(2)}):`, game.precio.toFixed(2));
+      if (newPrice !== null && !isNaN(parseFloat(newPrice))) {
+        game.precio = parseFloat(newPrice);
+        renderGames();
+        showToast(`Precio actualizado a $${game.precio.toFixed(2)}`);
+      }
+    }
+
+    function deleteGame(id) {
+      const game = games.find(g => g.id === id);
+      if (!game) return;
+      if (confirm(`¿Eliminar "${game.titulo}" del catálogo?`)) {
+        games = games.filter(g => g.id !== id);
+        renderGames();
+        showToast(`"${game.titulo}" eliminado.`, 'error');
+      }
+    }
+
+    // ── Toast ──
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const icon = type === 'success' ? 'check_circle' : 'delete';
+      const colorClass = type === 'success' ? 'text-secondary border-secondary/50' : 'text-error border-error/50';
+      toast.className = `glass-panel px-4 py-3 rounded-xl border flex items-center gap-3 toast-animate shadow-lg pointer-events-auto ${colorClass}`;
+      toast.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">${icon}</span><span class="text-body-md font-body-md text-on-surface">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0'; toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s'; setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ── Nav Toggle ──
+    function toggleNav() {
+      const nav = document.getElementById('sideNav');
+      const overlay = document.getElementById('navOverlay');
+      nav.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+
+    // Close modal on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Init
+    renderGames();
+  </script>
+</body>
+</html>

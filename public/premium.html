@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PixelCritic - Favoritos del Equipo. La selección editorial exclusiva del Equipo Tecno Capibara con las mejores calificaciones.">
+  <title>Favoritos del Equipo - PixelCritic</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-on-surface": "#313030", "on-surface": "#e5e2e1",
+            "on-primary-fixed": "#2c0051", "primary-fixed": "#f0dbff",
+            "surface-container": "#201f1f", "on-tertiary-fixed-variant": "#474747",
+            "secondary-fixed-dim": "#4ae176", "secondary-container": "#00b954",
+            "on-tertiary-container": "#2a2a2a", "on-secondary": "#003915",
+            "inverse-surface": "#e5e2e1", "on-tertiary-fixed": "#1b1b1b",
+            "primary-container": "#b76dff", "on-secondary-fixed": "#002109",
+            "on-error-container": "#ffdad6", "tertiary-fixed-dim": "#c6c6c6",
+            "error": "#ffb4ab", "tertiary-container": "#919191",
+            "primary-fixed-dim": "#ddb7ff", "outline": "#988d9f",
+            "outline-variant": "#4d4354", "on-secondary-fixed-variant": "#005321",
+            "inverse-primary": "#842bd2", "secondary": "#4ae176",
+            "surface-container-low": "#1c1b1b", "on-primary-fixed-variant": "#6900b3",
+            "on-primary": "#490080", "on-tertiary": "#303030",
+            "secondary-fixed": "#6bff8f", "surface-tint": "#ddb7ff",
+            "surface": "#131313", "error-container": "#93000a",
+            "on-error": "#690005", "surface-container-lowest": "#0e0e0e",
+            "surface-container-highest": "#353534", "on-surface-variant": "#cfc2d6",
+            "on-secondary-container": "#004119", "primary": "#ddb7ff",
+            "surface-bright": "#393939", "surface-variant": "#353534",
+            "tertiary": "#c6c6c6", "on-primary-container": "#400071",
+            "tertiary-fixed": "#e2e2e2", "on-background": "#e5e2e1",
+            "surface-container-high": "#2a2a2a", "surface-dim": "#131313",
+            "background": "#131313"
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+          spacing: { "xl": "80px", "lg": "48px", "xs": "4px", "gutter": "24px", "sm": "12px", "base": "8px", "container-max": "1280px", "md": "24px" },
+          fontFamily: { "body-md": ["Inter"], "label-sm": ["JetBrains Mono"], "headline-lg": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"], "display-lg": ["Space Grotesk"], "headline-md": ["Space Grotesk"], "body-lg": ["Inter"] },
+          fontSize: {
+            "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+            "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+            "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "600"}],
+            "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+            "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-panel {
+      background: rgba(28, 27, 27, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(77, 67, 84, 0.3);
+    }
+    .glass-card {
+      background: rgba(32, 31, 31, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(77, 67, 84, 0.2);
+      transition: all 0.35s ease;
+    }
+    .glass-card:hover {
+      border-color: #ddb7ff;
+      box-shadow: 0 0 28px rgba(221, 183, 255, 0.25), 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateY(-3px);
+    }
+    .nav-active { background: #b76dff; color: #400071; }
+    .ambient-glow-1 {
+      position: fixed; top: -150px; left: 25%; width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(183,109,255,0.12) 0%, transparent 65%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    .ambient-glow-2 {
+      position: fixed; bottom: -100px; right: 15%; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(74,225,118,0.09) 0%, transparent 65%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    .glow-primary { box-shadow: 0 0 20px rgba(221,183,255,0.3); }
+    .glow-secondary { box-shadow: 0 0 20px rgba(74,225,118,0.3); }
+    .score-ring {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px; font-weight: 700;
+    }
+    @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .toast-animate { animation: slideInUp 0.3s ease-out forwards; }
+    .star-full { color: #4ae176; }
+    .star-empty { color: #4d4354; }
+    .review-card {
+      border-left: 3px solid;
+      transition: all 0.25s;
+    }
+    .review-card:hover { transform: translateX(4px); }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden">
+
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- ── Side Navigation ── -->
+  <nav id="sideNav" class="fixed left-0 top-0 h-screen w-64 z-40 bg-surface-container-low/90 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col py-md transition-transform duration-300 -translate-x-full md:translate-x-0">
+    <div class="px-gutter mb-lg">
+      <h1 class="text-headline-md font-headline-md font-bold text-primary tracking-tight">PixelCritic</h1>
+      <p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">Gamer Editorial</p>
+    </div>
+    <div class="flex-1 flex flex-col gap-2 px-2">
+      <a href="index.html" class="nav-link flex items-center gap-4 text-on-surface-variant hover:text-on-surface rounded-full px-4 py-3 hover:bg-surface-variant/50 transition-all duration-300">
+        <span class="material-symbols-outlined">grid_view</span>
+        <span class="text-label-sm font-label-sm">Catálogo</span>
+      </a>
+      <a href="admin.html" class="nav-link flex items-center gap-4 text-on-surface-variant hover:text-on-surface rounded-full px-4 py-3 hover:bg-surface-variant/50 transition-all duration-300">
+        <span class="material-symbols-outlined">settings_applications</span>
+        <span class="text-label-sm font-label-sm">Administración</span>
+      </a>
+      <a href="premium.html" class="nav-link flex items-center gap-4 nav-active rounded-full px-4 py-3 transition-all duration-300">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+        <span class="text-label-sm font-label-sm">Favoritos del Equipo</span>
+      </a>
+    </div>
+    <div class="px-gutter mt-auto flex items-center gap-sm">
+      <div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center border border-outline-variant">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1; font-size:28px;">account_circle</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-label-sm font-label-sm text-on-surface">Tecno Capibara</span>
+        <span class="text-xs text-secondary font-label-sm">● Online</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Top Bar ── -->
+  <header class="fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center h-20 px-gutter md:ml-64">
+    <div class="flex items-center gap-sm">
+      <button onclick="toggleNav()" class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <span class="text-headline-md font-headline-md font-black text-primary md:hidden">PixelCritic</span>
+    </div>
+    <div class="hidden md:flex flex-1 max-w-md focus-within:ring-2 focus-within:ring-secondary/50 rounded-full bg-surface-container-low px-4 py-2 items-center gap-2 border border-outline-variant/50">
+      <span class="material-symbols-outlined text-on-surface-variant">search</span>
+      <input class="bg-transparent border-none text-body-md font-body-md text-on-surface placeholder-on-surface-variant focus:ring-0 w-full outline-none" placeholder="Buscar en favoritos..." type="text">
+    </div>
+    <div class="flex items-center gap-md ml-auto">
+      <button class="text-on-surface-variant hover:text-primary transition-colors relative">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
+      </button>
+      <button class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">account_circle</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main Content ── -->
+  <main class="relative z-10 pt-20 pb-16 md:ml-64 px-4 md:px-gutter min-h-screen flex flex-col gap-xl">
+
+    <!-- Page Header -->
+    <section class="mt-lg">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-md">
+        <div>
+          <div class="flex items-center gap-xs mb-2">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
+            <span class="text-label-sm font-label-sm text-primary tracking-widest uppercase">Colección Exclusiva · Tecno Capibara</span>
+          </div>
+          <h2 class="text-display-lg font-display-lg text-on-surface" style="font-size: clamp(2.5rem, 6vw, 4rem);">Favoritos<br><span class="text-primary">del Equipo</span></h2>
+          <p class="text-body-lg font-body-lg text-on-surface-variant mt-3 max-w-2xl">La selección editorial de nuestros expertos. Títulos con calificaciones más altas, reseñas verificadas y calidad excepcional.</p>
+        </div>
+        <div class="glass-panel flex items-center gap-sm px-4 py-3 rounded-2xl border-primary/20 shrink-0">
+          <span class="material-symbols-outlined text-secondary">filter_alt</span>
+          <span class="text-label-sm font-label-sm text-on-surface">Rating ≥ 4</span>
+          <div class="w-px h-4 bg-outline-variant mx-1"></div>
+          <span class="material-symbols-outlined text-secondary">sort</span>
+          <span class="text-label-sm font-label-sm text-on-surface">Descendente</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Bento Games Grid ── -->
+    <section id="gamesSection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md lg:gap-gutter">
+      <!-- Rendered by JS -->
+    </section>
+
+    <!-- ── Top Reviews Section ── -->
+    <section class="flex flex-col gap-6">
+      <div class="flex items-center gap-3 border-b border-outline-variant/30 pb-4">
+        <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">rate_review</span>
+        <h3 class="text-headline-md font-headline-md text-on-surface">Reseñas Destacadas</h3>
+        <span class="text-label-sm font-label-sm text-on-surface-variant bg-surface-variant px-3 py-1 rounded-full uppercase">Calificación ≥ 4</span>
+      </div>
+      <div id="reviewsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ── Metrics Card ── -->
+    <section>
+      <div class="glass-card rounded-2xl p-lg">
+        <div class="flex items-center gap-2 mb-8 border-b border-outline-variant/30 pb-4">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">analytics</span>
+          <h3 class="text-headline-md font-headline-md text-on-surface">Métricas del Equipo</h3>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="flex flex-col items-center gap-3 text-center">
+            <div class="score-ring border-4 border-primary/40 bg-primary/10 glow-primary text-primary" id="metricTotal">4</div>
+            <p class="text-label-sm font-label-sm text-on-surface-variant uppercase">Juegos en Catálogo</p>
+          </div>
+          <div class="flex flex-col items-center gap-3 text-center">
+            <div class="score-ring border-4 border-secondary/40 bg-secondary/10 glow-secondary text-secondary" id="metricAvg">4.3</div>
+            <p class="text-label-sm font-label-sm text-on-surface-variant uppercase">Calificación Media</p>
+          </div>
+          <div class="flex flex-col items-center gap-3 text-center">
+            <div class="score-ring border-4 border-primary/40 bg-primary/10 text-primary" id="metricTop">1</div>
+            <p class="text-label-sm font-label-sm text-on-surface-variant uppercase">Título Perfecto (5/5)</p>
+          </div>
+          <div class="flex items-center gap-4 p-4 rounded-xl bg-secondary/10 border border-secondary/20 glow-secondary">
+            <div class="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center border border-secondary/50 text-secondary shrink-0">
+              <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">verified</span>
+            </div>
+            <div>
+              <p class="text-label-sm font-label-sm text-secondary mb-1">CALIDAD VERIFICADA</p>
+              <p class="text-body-md font-body-md text-on-surface-variant text-sm">Todos los títulos con reseñas auténticas del equipo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="relative z-10 bg-surface-container-lowest md:ml-64 py-base border-t border-outline-variant/20 flex flex-wrap justify-between items-center gap-4 px-gutter">
+    <span class="text-label-sm font-label-sm text-on-tertiary-fixed-variant">Desarrollado por el Grupo Tecno Capibara</span>
+    <div class="flex gap-4">
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors" href="#">Términos</a>
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors" href="#">Privacidad</a>
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors" href="#">Contacto</a>
+    </div>
+    <span class="text-label-sm font-label-sm font-bold text-primary">PixelCritic</span>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toastContainer" class="fixed bottom-6 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
+  <div id="navOverlay" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden" onclick="toggleNav()"></div>
+
+  <script>
+    // ── Data ──
+    const games = [
+      { id: 1, titulo: "The Legend of Capibara", precio: 19.99, categoria: "Aventura", anio: 2025, calificacion: 5, desarrolladora: "Capibara Studios",
+        descripcion: "Una épica aventura de exploración donde guías a un capibara legendario a través de mundos fantásticos llenos de secretos." },
+      { id: 2, titulo: "Grand Theft Auto VI", precio: 69.99, categoria: "Accion", anio: 2025, calificacion: 5, desarrolladora: "Rockstar Games",
+        descripcion: "El regreso definitivo de la saga más icónica. Una historia sin precedentes en un mundo abierto revolucionario." },
+      { id: 3, titulo: "Final Fantasy XVII", precio: 79.99, categoria: "RPG", anio: 2026, calificacion: 4, desarrolladora: "Capibara Studios",
+        descripcion: "Una nueva saga de fantasía con gráficos de próxima generación y un sistema de combate completamente reimaginado." },
+      { id: 4, titulo: "EAFC 26", precio: 59.99, categoria: "Deportes", anio: 2026, calificacion: 3, desarrolladora: "Epic Games",
+        descripcion: "La nueva entrega del simulador de fútbol con mejoras en físicas e inteligencia artificial." },
+    ];
+
+    const reviews = [
+      { autor: "MariangelO", juego: "The Legend of Capibara", calificacion: 5, comentario: "Obra maestra 10/10. Una experiencia que no olvidarás jamás. El mundo es increíblemente detallado." },
+      { autor: "FabianaR", juego: "Grand Theft Auto VI", calificacion: 5, comentario: "Valió la pena la espera. Historia épica, mundo vivo y una libertad de juego sin igual." },
+      { autor: "YeismarR", juego: "Final Fantasy XVII", calificacion: 4, comentario: "Excelentes gráficos, historia confusa pero el combate es adictivo. Muy recomendado para fans del género." },
+    ];
+
+    const catColors = { 'RPG': '#ddb7ff', 'Accion': '#ff8a65', 'Aventura': '#4ae176', 'Deportes': '#64b5f6', 'Estrategia': '#ffd54f', 'Shooter': '#ef5350' };
+    const coverImages = {
+      'Aventura': 'https://images.unsplash.com/photo-1518791841217-8f162f1912da?w=600&h=400&fit=crop',
+      'Accion': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&h=400&fit=crop',
+      'Deportes': 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&h=400&fit=crop',
+      'RPG': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop',
+    };
+
+    function getStars(rating, size = 'text-base') {
+      return Array.from({length: 5}, (_, i) =>
+        `<span class="material-symbols-outlined ${size} ${i < rating ? 'text-secondary' : 'text-outline-variant'}" style="font-variation-settings:'FILL' ${i < rating ? 1 : 0};">star</span>`
+      ).join('');
+    }
+
+    function renderGames() {
+      const topGames = [...games].filter(g => g.calificacion >= 4).sort((a, b) => b.calificacion - a.calificacion);
+      const section = document.getElementById('gamesSection');
+
+      section.innerHTML = topGames.map((g, idx) => {
+        const isFeatured = idx === 0;
+        const color = catColors[g.categoria] || '#ddb7ff';
+        const img = coverImages[g.categoria] || 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=600&h=400&fit=crop';
+
+        if (isFeatured) {
+          return `
+          <article class="glass-card rounded-2xl overflow-hidden group relative lg:col-span-2 flex flex-col md:flex-row min-h-[380px]">
+            <div class="absolute top-4 left-4 z-10 flex gap-2 flex-wrap">
+              <span class="bg-primary/20 text-primary border border-primary/40 text-label-sm font-label-sm px-3 py-1 rounded-full backdrop-blur-md flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1;">star</span> PREMIUM
+              </span>
+              <span class="bg-surface-container/80 text-on-surface text-label-sm font-label-sm px-3 py-1 rounded-full backdrop-blur-md">${g.categoria}</span>
+            </div>
+            <div class="w-full md:w-3/5 min-h-[220px] md:min-h-full relative overflow-hidden">
+              <img alt="Portada de ${g.titulo}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${img}">
+              <div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-surface/30 md:to-surface"></div>
+            </div>
+            <div class="w-full md:w-2/5 p-lg flex flex-col justify-center bg-surface md:bg-transparent">
+              <h3 class="text-headline-lg font-headline-lg text-on-surface mb-2 group-hover:text-primary transition-colors">${g.titulo}</h3>
+              <p class="text-on-surface-variant text-body-md font-body-md mb-4 line-clamp-3">${g.descripcion}</p>
+              <div class="flex items-center gap-1 mb-2">${getStars(g.calificacion, 'text-lg')}</div>
+              <p class="text-label-sm font-label-sm text-on-surface-variant mb-6">${g.calificacion}.0 / 5.0 · ${g.desarrolladora} · ${g.anio}</p>
+              <div class="flex items-center justify-between">
+                <span class="text-headline-md font-headline-md text-secondary">$${g.precio.toFixed(2)}</span>
+                <button onclick="showToast('¡${g.titulo} agregado a favoritos!')" class="bg-primary hover:bg-primary-container text-on-primary-fixed font-label-sm text-label-sm px-5 py-3 rounded-full flex items-center gap-2 transition-all glow-primary hover:scale-105">
+                  <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">favorite</span> FAVORITO
+                </button>
+              </div>
+            </div>
+          </article>`;
+        }
+
+        return `
+        <article class="glass-card rounded-2xl overflow-hidden group relative flex flex-col h-[380px]">
+          <div class="absolute top-3 left-3 z-10 flex gap-2">
+            <span class="bg-primary/20 text-primary border border-primary/40 text-label-sm font-label-sm px-2 py-1 rounded-full backdrop-blur-md flex items-center gap-1">
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1;">star</span> PREMIUM
+            </span>
+          </div>
+          <div class="absolute top-3 right-3 z-10">
+            <div class="bg-surface/80 backdrop-blur-md border border-secondary/30 text-secondary text-label-sm font-label-sm px-2 py-1 rounded-lg flex items-center gap-1">
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1;">star</span>
+              ${g.calificacion}.0
+            </div>
+          </div>
+          <div class="h-1/2 relative overflow-hidden">
+            <img alt="Portada de ${g.titulo}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${img}">
+            <div class="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent"></div>
+          </div>
+          <div class="h-1/2 p-md flex flex-col bg-surface-container relative">
+            <span class="text-[10px] font-label-sm uppercase tracking-wider mb-1" style="color:${color}">${g.categoria} · ${g.anio}</span>
+            <h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">${g.titulo}</h3>
+            <p class="text-body-md font-body-md text-on-surface-variant line-clamp-2 mb-auto text-sm">${g.descripcion}</p>
+            <div class="flex items-center justify-between border-t border-outline-variant/30 pt-3 mt-3">
+              <span class="text-headline-md font-headline-md text-secondary">$${g.precio.toFixed(2)}</span>
+              <button onclick="showToast('¡${g.titulo} agregado!')" class="border border-secondary text-secondary hover:bg-secondary/10 font-label-sm text-label-sm px-3 py-2 rounded-full transition-colors flex items-center gap-1 text-xs">
+                <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">favorite</span> Guardar
+              </button>
+            </div>
+          </div>
+        </article>`;
+      }).join('');
+    }
+
+    function renderReviews() {
+      const grid = document.getElementById('reviewsGrid');
+      const topReviews = reviews.filter(r => r.calificacion >= 4);
+      const reviewColors = { 5: '#4ae176', 4: '#ddb7ff', 3: '#ffd54f' };
+
+      grid.innerHTML = topReviews.map(r => `
+        <div class="glass-panel rounded-xl p-5 review-card" style="border-left-color: ${reviewColors[r.calificacion] || '#4d4354'}">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-sm">person</span>
+              </div>
+              <div>
+                <p class="text-body-md font-body-md text-on-surface font-semibold">${r.autor}</p>
+                <p class="text-label-sm font-label-sm text-on-surface-variant">${r.juego}</p>
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-1">
+              <div class="flex items-center gap-1">${getStars(r.calificacion, 'text-sm')}</div>
+              <span class="text-label-sm font-label-sm" style="color:${reviewColors[r.calificacion] || '#4ae176'}">${r.calificacion}.0 / 5</span>
+            </div>
+          </div>
+          <p class="text-body-md font-body-md text-on-surface-variant italic leading-relaxed">"${r.comentario}"</p>
+        </div>
+      `).join('');
+    }
+
+    function updateMetrics() {
+      const avg = (games.reduce((s, g) => s + g.calificacion, 0) / games.length).toFixed(1);
+      document.getElementById('metricTotal').textContent = games.length;
+      document.getElementById('metricAvg').textContent = avg;
+      document.getElementById('metricTop').textContent = games.filter(g => g.calificacion === 5).length;
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const icon = type === 'success' ? 'favorite' : 'error';
+      const colorClass = type === 'success' ? 'text-secondary border-secondary/50' : 'text-error border-error/50';
+      toast.className = `glass-panel px-4 py-3 rounded-xl border flex items-center gap-3 toast-animate shadow-lg pointer-events-auto ${colorClass}`;
+      toast.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">${icon}</span><span class="text-body-md font-body-md text-on-surface">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateY(10px)'; toast.style.transition='all 0.3s'; setTimeout(()=>toast.remove(),300); }, 3000);
+    }
+
+    function toggleNav() {
+      document.getElementById('sideNav').classList.toggle('-translate-x-full');
+      document.getElementById('navOverlay').classList.toggle('hidden');
+    }
+
+    // Init
+    renderGames();
+    renderReviews();
+    updateMetrics();
+  </script>
+</body>
+</html>

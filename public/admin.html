@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PixelCritic Admin - Panel de gestión centralizada del inventario de juegos y moderación de reseñas.">
+  <title>Administración - PixelCritic</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-on-surface": "#313030", "on-surface": "#e5e2e1",
+            "on-primary-fixed": "#2c0051", "primary-fixed": "#f0dbff",
+            "surface-container": "#201f1f", "on-tertiary-fixed-variant": "#474747",
+            "secondary-fixed-dim": "#4ae176", "secondary-container": "#00b954",
+            "on-tertiary-container": "#2a2a2a", "on-secondary": "#003915",
+            "inverse-surface": "#e5e2e1", "on-tertiary-fixed": "#1b1b1b",
+            "primary-container": "#b76dff", "on-secondary-fixed": "#002109",
+            "on-error-container": "#ffdad6", "tertiary-fixed-dim": "#c6c6c6",
+            "error": "#ffb4ab", "tertiary-container": "#919191",
+            "primary-fixed-dim": "#ddb7ff", "outline": "#988d9f",
+            "outline-variant": "#4d4354", "on-secondary-fixed-variant": "#005321",
+            "inverse-primary": "#842bd2", "secondary": "#4ae176",
+            "surface-container-low": "#1c1b1b", "on-primary-fixed-variant": "#6900b3",
+            "on-primary": "#490080", "on-tertiary": "#303030",
+            "secondary-fixed": "#6bff8f", "surface-tint": "#ddb7ff",
+            "surface": "#131313", "error-container": "#93000a",
+            "on-error": "#690005", "surface-container-lowest": "#0e0e0e",
+            "surface-container-highest": "#353534", "on-surface-variant": "#cfc2d6",
+            "on-secondary-container": "#004119", "primary": "#ddb7ff",
+            "surface-bright": "#393939", "surface-variant": "#353534",
+            "tertiary": "#c6c6c6", "on-primary-container": "#400071",
+            "tertiary-fixed": "#e2e2e2", "on-background": "#e5e2e1",
+            "surface-container-high": "#2a2a2a", "surface-dim": "#131313",
+            "background": "#131313"
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+          spacing: { "xl": "80px", "lg": "48px", "xs": "4px", "gutter": "24px", "sm": "12px", "base": "8px", "container-max": "1280px", "md": "24px" },
+          fontFamily: { "body-md": ["Inter"], "label-sm": ["JetBrains Mono"], "headline-lg": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"], "display-lg": ["Space Grotesk"], "headline-md": ["Space Grotesk"], "body-lg": ["Inter"] },
+          fontSize: {
+            "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+            "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+            "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "600"}],
+            "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+            "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-panel {
+      background: rgba(18, 18, 18, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(77, 67, 84, 0.35);
+    }
+    .nav-active { background: #b76dff; color: #400071; }
+    .ambient-glow-1 {
+      position: fixed; top: -150px; right: 20%; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(183,109,255,0.1) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    .ambient-glow-2 {
+      position: fixed; bottom: -100px; left: 10%; width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(74,225,118,0.07) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    .table-row-delete { animation: rowDelete 0.35s ease-out forwards; }
+    @keyframes rowDelete {
+      0% { opacity: 1; background: rgba(255,180,171,0.15); }
+      100% { opacity: 0; transform: translateX(20px); height: 0; padding: 0; }
+    }
+    .table-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
+    .table-scroll::-webkit-scrollbar-track { background: #131313; }
+    .table-scroll::-webkit-scrollbar-thumb { background: #4d4354; border-radius: 4px; }
+    .table-scroll::-webkit-scrollbar-thumb:hover { background: #b76dff; }
+    @keyframes slideInUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .toast-animate { animation: slideInUp 0.3s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+    .modal-show { animation: fadeIn 0.25s ease-out forwards; }
+    .input-cyber {
+      background-color: #000;
+      border: none;
+      border-bottom: 2px solid #4d4354;
+      transition: all 0.3s;
+    }
+    .input-cyber:focus { outline: none; border-bottom-color: #ddb7ff; box-shadow: 0 10px 10px -10px rgba(221,183,255,0.5); }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden">
+
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- ── Side Navigation ── -->
+  <nav id="sideNav" class="fixed left-0 top-0 h-screen w-64 z-40 bg-surface-container-low/90 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col py-md transition-transform duration-300 -translate-x-full md:translate-x-0">
+    <div class="px-gutter mb-lg">
+      <h1 class="text-headline-md font-headline-md font-bold text-primary tracking-tight">PixelCritic</h1>
+      <p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">Gamer Editorial</p>
+    </div>
+    <div class="flex-1 flex flex-col gap-2 px-2">
+      <a href="index.html" class="nav-link flex items-center gap-4 text-on-surface-variant hover:text-on-surface rounded-full px-4 py-3 hover:bg-surface-variant/50 transition-all duration-300">
+        <span class="material-symbols-outlined">grid_view</span>
+        <span class="text-label-sm font-label-sm">Catálogo</span>
+      </a>
+      <a href="admin.html" class="nav-link flex items-center gap-4 nav-active rounded-full px-4 py-3 transition-all duration-300">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_applications</span>
+        <span class="text-label-sm font-label-sm">Administración</span>
+      </a>
+      <a href="premium.html" class="nav-link flex items-center gap-4 text-on-surface-variant hover:text-on-surface rounded-full px-4 py-3 hover:bg-surface-variant/50 transition-all duration-300">
+        <span class="material-symbols-outlined">workspace_premium</span>
+        <span class="text-label-sm font-label-sm">Favoritos del Equipo</span>
+      </a>
+    </div>
+    <div class="px-gutter mt-auto flex items-center gap-sm">
+      <div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center border border-outline-variant">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1; font-size:28px;">account_circle</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-label-sm font-label-sm text-on-surface">Tecno Capibara</span>
+        <span class="text-xs text-secondary font-label-sm">● Online</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Top Bar ── -->
+  <header class="fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center h-20 px-gutter md:ml-64">
+    <div class="flex items-center gap-sm">
+      <button onclick="toggleNav()" class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <span class="text-headline-md font-headline-md font-black text-primary md:hidden">PixelCritic</span>
+    </div>
+    <div class="hidden md:flex flex-1 max-w-md focus-within:ring-2 focus-within:ring-secondary/50 rounded-full bg-surface-container-low px-4 py-2 items-center gap-2 border border-outline-variant/50">
+      <span class="material-symbols-outlined text-on-surface-variant">search</span>
+      <input class="bg-transparent border-none text-body-md font-body-md text-on-surface placeholder-on-surface-variant focus:ring-0 w-full outline-none" placeholder="Buscar en administración..." type="text">
+    </div>
+    <div class="flex items-center gap-md ml-auto">
+      <button class="text-on-surface-variant hover:text-primary transition-colors relative">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
+      </button>
+      <button class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">account_circle</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main Content ── -->
+  <main class="relative z-10 pt-24 pb-16 md:ml-64 px-4 md:px-gutter min-h-screen flex flex-col gap-xl">
+
+    <!-- Page header -->
+    <div class="pt-lg flex items-end justify-between flex-wrap gap-4">
+      <div>
+        <p class="text-label-sm font-label-sm text-secondary uppercase tracking-widest mb-2">Panel de Control</p>
+        <h2 class="text-display-lg font-display-lg text-on-surface tracking-tight">Gestión <span class="text-primary">Admin</span></h2>
+        <p class="text-body-lg font-body-lg text-on-surface-variant mt-2 max-w-2xl">Control centralizado del inventario de juegos y moderación de la comunidad PixelCritic.</p>
+      </div>
+
+      <!-- Stats row -->
+      <div class="flex gap-4 flex-wrap">
+        <div class="glass-panel rounded-xl px-5 py-4 text-center min-w-[110px]">
+          <p class="text-display-lg font-display-lg text-primary leading-none" style="font-size:32px;" id="statJuegos">4</p>
+          <p class="text-label-sm font-label-sm text-on-surface-variant uppercase mt-1">Juegos</p>
+        </div>
+        <div class="glass-panel rounded-xl px-5 py-4 text-center min-w-[110px]">
+          <p class="text-display-lg font-display-lg text-secondary leading-none" style="font-size:32px;" id="statResenas">4</p>
+          <p class="text-label-sm font-label-sm text-on-surface-variant uppercase mt-1">Reseñas</p>
+        </div>
+        <div class="glass-panel rounded-xl px-5 py-4 text-center min-w-[110px]">
+          <p class="text-display-lg font-display-lg text-error leading-none" style="font-size:32px;" id="statReportadas">1</p>
+          <p class="text-label-sm font-label-sm text-on-surface-variant uppercase mt-1">Reportadas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Section 1: Game Inventory ── -->
+    <section class="flex flex-col gap-6">
+      <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
+        <h3 class="text-headline-md font-headline-md text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">inventory_2</span>
+          Inventario de Juegos
+        </h3>
+        <div class="flex items-center gap-3">
+          <span id="gameCount" class="bg-surface-variant text-on-surface-variant text-label-sm font-label-sm px-3 py-1 rounded-full uppercase">4 Items</span>
+          <button onclick="openAddModal()" class="flex items-center gap-2 bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 px-4 py-2 rounded-lg text-label-sm font-label-sm uppercase transition-all">
+            <span class="material-symbols-outlined text-lg">add</span>
+            Nuevo Juego
+          </button>
+        </div>
+      </div>
+      <div class="glass-panel rounded-xl overflow-hidden shadow-lg">
+        <div class="overflow-x-auto table-scroll">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-outline-variant/30 bg-surface-container/50">
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Título</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Categoría</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Año</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Precio Base</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="gameTableBody" class="divide-y divide-outline-variant/10">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 2: Users ── -->
+    <section class="flex flex-col gap-6">
+      <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
+        <h3 class="text-headline-md font-headline-md text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">group</span>
+          Usuarios Registrados
+        </h3>
+        <span class="bg-surface-variant text-on-surface-variant text-label-sm font-label-sm px-3 py-1 rounded-full uppercase">4 Usuarios</span>
+      </div>
+      <div class="glass-panel rounded-xl overflow-hidden shadow-lg">
+        <div class="overflow-x-auto table-scroll">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-outline-variant/30 bg-surface-container/50">
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Username</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Email</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Edad</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/10">
+              <tr class="hover:bg-surface-container-high/30 transition-colors">
+                <td class="py-4 px-6 flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-sm">person</span></div>
+                  <span class="text-body-md font-body-md text-on-surface font-medium">MariangelO</span>
+                </td>
+                <td class="py-4 px-6 text-on-surface-variant font-label-sm">mari@correo.com</td>
+                <td class="py-4 px-6 text-on-surface-variant font-label-sm">21</td>
+                <td class="py-4 px-6"><span class="px-2 py-1 rounded-full text-label-sm font-label-sm bg-secondary/15 text-secondary border border-secondary/30">● Activo</span></td>
+              </tr>
+              <tr class="hover:bg-surface-container-high/30 transition-colors">
+                <td class="py-4 px-6 flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-sm">person</span></div>
+                  <span class="text-body-md font-body-md text-on-surface font-medium">SamuelJ</span>
+                </td>
+                <td class="py-4 px-6 text-on-surface-variant font-label-sm">samuel@correo.com</td>
+                <td class="py-4 px-6 text-on-surface-variant font-label-sm">22</td>
+                <td class="py-4 px-6"><span class="px-2 py-1 rounded-full text-label-sm font-label-sm bg-secondary/15 text-secondary border border-secondary/30">● Activo</span></td>
+              </tr>
+              <tr class="hover:bg-surface-container-high/30 transition-colors">
+                <td class="py-4 px-6 flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-outline-variant/30 flex items-center justify-center"><span class="material-symbols-outlined text-on-surface-variant text-sm">person</span></div>
+                  <span class="text-body-md font-body-md text-on-surface font-medium">FabianaR</span>
+                </td>
+                <td class="py-4 px-6 text-on-surface-variant font-label-sm">fabi@correo.com</td>
+                <td class="py-4 px-6 text-on-surface-variant font-label-sm">20</td>
+                <td class="py-4 px-6"><span class="px-2 py-1 rounded-full text-label-sm font-label-sm bg-outline-variant/20 text-on-surface-variant border border-outline-variant/40">○ Inactivo</span></td>
+              </tr>
+              <tr class="hover:bg-surface-container-high/30 transition-colors">
+                <td class="py-4 px-6 flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-sm">person</span></div>
+                  <span class="text-body-md font-body-md text-on-surface font-medium">YeismarR</span>
+                </td>
+                <td class="py-4 px-6 text-on-surface-variant font-label-sm">yeismar@correo.com</td>
+                <td class="py-4 px-6 text-on-surface-variant font-label-sm">21</td>
+                <td class="py-4 px-6"><span class="px-2 py-1 rounded-full text-label-sm font-label-sm bg-secondary/15 text-secondary border border-secondary/30">● Activo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 3: Review Moderation ── -->
+    <section class="flex flex-col gap-6">
+      <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
+        <h3 class="text-headline-md font-headline-md text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-error">gavel</span>
+          Moderación de Reseñas
+        </h3>
+        <span class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+          <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Reportes Activos</span>
+        </span>
+      </div>
+      <div class="glass-panel rounded-xl overflow-hidden shadow-lg">
+        <div class="overflow-x-auto table-scroll">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-outline-variant/30 bg-surface-container/50">
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Autor</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Juego</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider w-24">Rating</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Comentario</th>
+                <th class="py-4 px-6 text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="reviewTableBody" class="divide-y divide-outline-variant/10">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="relative z-10 bg-surface-container-lowest md:ml-64 py-base border-t border-outline-variant/20 flex flex-wrap justify-between items-center gap-4 px-gutter">
+    <span class="text-label-sm font-label-sm font-bold text-primary">Desarrollado por el Grupo Tecno Capibara</span>
+    <div class="flex gap-4">
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors uppercase tracking-wider" href="#">Términos</a>
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors uppercase tracking-wider" href="#">Privacidad</a>
+      <a class="text-label-sm font-label-sm text-on-tertiary-fixed-variant hover:text-secondary transition-colors uppercase tracking-wider" href="#">Contacto</a>
+    </div>
+  </footer>
+
+  <!-- ── Edit Price Modal ── -->
+  <div id="editModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeEditModal()"></div>
+    <div class="glass-panel modal-show relative w-full max-w-md rounded-2xl shadow-2xl border border-primary/20 flex flex-col overflow-hidden">
+      <div class="p-md border-b border-outline-variant/30 flex justify-between items-center bg-surface-container/50">
+        <h3 class="text-headline-md font-headline-md text-primary font-bold" id="editModalTitle">Editar Precio</h3>
+        <button onclick="closeEditModal()" class="text-on-surface-variant hover:text-error transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form class="p-md flex flex-col gap-6" onsubmit="saveEditPrice(event)">
+        <input type="hidden" id="editGameId">
+        <div class="flex flex-col gap-1">
+          <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Nuevo Precio (USD)</label>
+          <div class="relative">
+            <span class="absolute left-0 top-2 text-on-surface-variant">$</span>
+            <input id="editPriceInput" class="input-cyber w-full py-2 pl-4 text-body-md font-body-md text-secondary" type="number" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="flex justify-end gap-4 border-t border-outline-variant/30 pt-4">
+          <button type="button" onclick="closeEditModal()" class="px-6 py-2 border border-outline-variant text-on-surface-variant rounded-lg font-label-sm text-label-sm uppercase hover:bg-surface-variant/30 transition-colors">Cancelar</button>
+          <button type="submit" class="bg-secondary text-on-secondary hover:bg-secondary/80 px-6 py-2 rounded-lg font-label-sm text-label-sm uppercase transition-all shadow-[0_0_15px_rgba(74,225,118,0.2)] hover:shadow-[0_0_25px_rgba(74,225,118,0.4)]">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Add Game Modal ── -->
+  <div id="addModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeAddModal()"></div>
+    <div class="glass-panel modal-show relative w-full max-w-lg rounded-2xl shadow-2xl border border-primary/20 flex flex-col max-h-[90vh] overflow-hidden">
+      <div class="p-md border-b border-outline-variant/30 flex justify-between items-center bg-surface-container/50">
+        <h3 class="text-headline-md font-headline-md text-primary font-bold">Nuevo Juego</h3>
+        <button onclick="closeAddModal()" class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <form id="addGameForm" class="p-md overflow-y-auto flex flex-col gap-5" onsubmit="saveNewGame(event)">
+        <div class="flex flex-col gap-1">
+          <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Título *</label>
+          <input id="aTitle" class="input-cyber w-full py-2 text-body-md font-body-md text-on-surface" placeholder="Ej. The Legend of Capibara" required type="text">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Precio (USD) *</label>
+            <div class="relative">
+              <span class="absolute left-0 top-2 text-on-surface-variant text-sm">$</span>
+              <input id="aPrice" class="input-cyber w-full py-2 pl-4 text-body-md font-body-md text-secondary" placeholder="59.99" required step="0.01" min="0" type="number">
+            </div>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Año *</label>
+            <input id="aYear" class="input-cyber w-full py-2 text-body-md font-body-md text-on-surface" max="2030" min="1980" placeholder="2025" required type="number">
+          </div>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Categoría *</label>
+          <select id="aCat" class="input-cyber w-full py-2 text-body-md font-body-md text-on-surface bg-transparent appearance-none cursor-pointer" required>
+            <option disabled selected value="">Selecciona...</option>
+            <option>RPG</option><option>Accion</option><option>Aventura</option>
+            <option>Deportes</option><option>Estrategia</option><option>Shooter</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-4 border-t border-outline-variant/30 pt-4">
+          <button type="button" onclick="closeAddModal()" class="px-6 py-2 border border-secondary text-secondary rounded-lg font-label-sm text-label-sm uppercase hover:bg-secondary/10 transition-colors">Cancelar</button>
+          <button type="submit" class="bg-primary text-on-primary-fixed hover:bg-primary-container px-6 py-2 rounded-lg font-label-sm text-label-sm uppercase transition-all shadow-[0_0_15px_rgba(221,183,255,0.2)] hover:shadow-[0_0_25px_rgba(221,183,255,0.5)]">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toastContainer" class="fixed bottom-6 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
+  <div id="navOverlay" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden" onclick="toggleNav()"></div>
+
+  <script>
+    // ── Data ──
+    let games = [
+      { id: 1, titulo: "The Legend of Capibara", precio: 19.99, categoria: "Aventura", anioLanzamiento: 2025 },
+      { id: 2, titulo: "Grand Theft Auto VI", precio: 69.99, categoria: "Accion", anioLanzamiento: 2025 },
+      { id: 3, titulo: "EAFC 26", precio: 59.99, categoria: "Deportes", anioLanzamiento: 2026 },
+      { id: 4, titulo: "Final Fantasy XVII", precio: 79.99, categoria: "RPG", anioLanzamiento: 2026 },
+    ];
+    let reviews = [
+      { id: 1, autor: "MariangelO", juego: "The Legend of Capibara", calificacion: 5, comentario: "Obra maestra 10/10", flagged: false },
+      { id: 2, autor: "SamuelJ", juego: "EAFC 26", calificacion: 3, comentario: "Más de lo mismo", flagged: false },
+      { id: 3, autor: "FabianaR", juego: "Grand Theft Auto VI", calificacion: 5, comentario: "Valió la pena la espera", flagged: false },
+      { id: 4, autor: "YeismarR", juego: "Final Fantasy XVII", calificacion: 4, comentario: "Excelentes gráficos, historia confusa", flagged: false },
+      { id: 5, autor: "UsuarioBaneado", juego: "The Legend of Capibara", calificacion: 1, comentario: "No me gustó, aburrido", flagged: true },
+    ];
+
+    const catColors = { 'RPG': '#ddb7ff', 'Accion': '#ff8a65', 'Aventura': '#4ae176', 'Deportes': '#64b5f6', 'Deportes': '#64b5f6', 'Estrategia': '#ffd54f', 'Shooter': '#ef5350' };
+
+    function renderGameTable() {
+      const tbody = document.getElementById('gameTableBody');
+      tbody.innerHTML = games.map(g => `
+        <tr class="hover:bg-surface-container-high/30 transition-colors group" id="game-row-${g.id}">
+          <td class="py-4 px-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-surface-container-high flex-shrink-0 flex items-center justify-center" style="border:1px solid ${catColors[g.categoria] || '#4d4354'}30">
+                <span class="material-symbols-outlined text-sm" style="color:${catColors[g.categoria] || '#cfc2d6'}">sports_esports</span>
+              </div>
+              <span class="text-body-md font-body-md text-on-surface font-medium group-hover:text-primary transition-colors">${g.titulo}</span>
+            </div>
+          </td>
+          <td class="py-4 px-6">
+            <span class="inline-flex items-center px-2 py-1 rounded-lg text-label-sm font-label-sm border" style="background:${catColors[g.categoria] || '#ddb7ff'}18; color:${catColors[g.categoria] || '#ddb7ff'}; border-color:${catColors[g.categoria] || '#ddb7ff'}30">${g.categoria}</span>
+          </td>
+          <td class="py-4 px-6 text-on-surface-variant font-label-sm">${g.anioLanzamiento}</td>
+          <td class="py-4 px-6 text-body-md font-body-md text-secondary font-mono">$${g.precio.toFixed(2)}</td>
+          <td class="py-4 px-6 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <button onclick="openEditModal(${g.id})" class="inline-flex items-center gap-2 px-3 py-2 border border-secondary/50 text-secondary rounded-lg hover:bg-secondary/10 hover:border-secondary transition-all text-label-sm font-label-sm uppercase">
+                <span class="material-symbols-outlined text-[16px]">edit</span> Editar
+              </button>
+              <button onclick="deleteGame(${g.id})" class="inline-flex items-center gap-2 px-3 py-2 border border-error/30 text-error rounded-lg hover:bg-error/10 hover:border-error transition-all text-label-sm font-label-sm uppercase">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('gameCount').textContent = `${games.length} Items`;
+      document.getElementById('statJuegos').textContent = games.length;
+    }
+
+    function renderReviewTable() {
+      const tbody = document.getElementById('reviewTableBody');
+      tbody.innerHTML = reviews.map(r => {
+        const ratingColor = r.calificacion >= 4 ? 'text-secondary' : r.calificacion >= 3 ? 'text-primary' : 'text-error';
+        return `
+        <tr class="hover:bg-surface-container-high/30 transition-colors ${r.flagged ? 'bg-error/5' : ''}" id="review-row-${r.id}">
+          <td class="py-4 px-6">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+                <span class="material-symbols-outlined text-[14px]">person</span>
+              </div>
+              <div>
+                <span class="text-body-md font-body-md text-on-surface font-medium block">${r.autor}</span>
+                ${r.flagged ? '<span class="text-[10px] text-error font-label-sm uppercase tracking-wider">⚠ Reportado</span>' : ''}
+              </div>
+            </div>
+          </td>
+          <td class="py-4 px-6 text-on-surface-variant font-label-sm">${r.juego}</td>
+          <td class="py-4 px-6">
+            <div class="flex items-center gap-1">
+              <span class="material-symbols-outlined ${ratingColor} text-[14px]" style="font-variation-settings:'FILL' 1;">star</span>
+              <span class="text-body-md font-body-md ${ratingColor} font-bold font-mono">${r.calificacion}.0</span>
+            </div>
+          </td>
+          <td class="py-4 px-6">
+            <p class="text-body-md font-body-md text-on-surface-variant italic truncate max-w-xs">"${r.comentario}"</p>
+          </td>
+          <td class="py-4 px-6 text-right">
+            <button onclick="deleteReview(${r.id})" class="inline-flex items-center gap-2 px-3 py-2 border border-error/40 text-error rounded-lg hover:bg-error/10 hover:border-error transition-all text-label-sm font-label-sm uppercase">
+              <span class="material-symbols-outlined text-[16px]">delete</span> Eliminar
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+      document.getElementById('statResenas').textContent = reviews.length;
+      document.getElementById('statReportadas').textContent = reviews.filter(r => r.flagged).length;
+    }
+
+    // ── Edit Price Modal ──
+    function openEditModal(id) {
+      const g = games.find(x => x.id === id);
+      if (!g) return;
+      document.getElementById('editGameId').value = id;
+      document.getElementById('editPriceInput').value = g.precio.toFixed(2);
+      document.getElementById('editModalTitle').textContent = `Editar: ${g.titulo}`;
+      const m = document.getElementById('editModal');
+      m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function closeEditModal() {
+      const m = document.getElementById('editModal');
+      m.classList.add('hidden'); m.classList.remove('flex');
+    }
+    function saveEditPrice(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('editGameId').value);
+      const price = parseFloat(document.getElementById('editPriceInput').value);
+      const g = games.find(x => x.id === id);
+      if (g) { g.precio = price; renderGameTable(); showToast(`Precio de "${g.titulo}" actualizado a $${price.toFixed(2)}`); }
+      closeEditModal();
+    }
+
+    // ── Add Modal ──
+    function openAddModal() {
+      const m = document.getElementById('addModal');
+      m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function closeAddModal() {
+      const m = document.getElementById('addModal');
+      m.classList.add('hidden'); m.classList.remove('flex');
+      document.getElementById('addGameForm').reset();
+    }
+    function saveNewGame(e) {
+      e.preventDefault();
+      const g = {
+        id: Date.now(),
+        titulo: document.getElementById('aTitle').value,
+        precio: parseFloat(document.getElementById('aPrice').value),
+        categoria: document.getElementById('aCat').value,
+        anioLanzamiento: parseInt(document.getElementById('aYear').value),
+      };
+      games.push(g);
+      renderGameTable();
+      showToast(`"${g.titulo}" agregado al inventario.`);
+      closeAddModal();
+    }
+
+    function deleteGame(id) {
+      const g = games.find(x => x.id === id);
+      if (!g) return;
+      const row = document.getElementById(`game-row-${id}`);
+      row.classList.add('table-row-delete');
+      setTimeout(() => {
+        games = games.filter(x => x.id !== id);
+        renderGameTable();
+        showToast(`"${g.titulo}" eliminado.`, 'error');
+      }, 350);
+    }
+
+    function deleteReview(id) {
+      const r = reviews.find(x => x.id === id);
+      if (!r) return;
+      const row = document.getElementById(`review-row-${id}`);
+      row.classList.add('table-row-delete');
+      setTimeout(() => {
+        reviews = reviews.filter(x => x.id !== id);
+        renderReviewTable();
+        showToast(`Reseña de "${r.autor}" eliminada.`, 'error');
+      }, 350);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const icon = type === 'success' ? 'check_circle' : 'delete';
+      const colorClass = type === 'success' ? 'text-secondary border-secondary/50' : 'text-error border-error/50';
+      toast.className = `glass-panel px-4 py-3 rounded-xl border flex items-center gap-3 toast-animate shadow-lg pointer-events-auto ${colorClass}`;
+      toast.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">${icon}</span><span class="text-body-md font-body-md text-on-surface">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateY(10px)'; toast.style.transition='all 0.3s'; setTimeout(()=>toast.remove(),300); }, 3000);
+    }
+
+    function toggleNav() {
+      document.getElementById('sideNav').classList.toggle('-translate-x-full');
+      document.getElementById('navOverlay').classList.toggle('hidden');
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeEditModal(); closeAddModal(); }
+    });
+
+    // Init
+    renderGameTable();
+    renderReviewTable();
+  </script>
+</body>
+</html>
