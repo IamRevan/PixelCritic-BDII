@@ -83,7 +83,7 @@ Abre tu terminal y ejecuta:
 
 ```bash
 git clone https://github.com/tu-usuario/PixelCritic-TecnoCapibara.git
-cd PixelCritic-TecnoCapibara
+cd PixelCritic-BDII
 ```
 
 ### 2. Instalar las Dependencias
