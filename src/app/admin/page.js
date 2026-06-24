@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import ConfirmModal from '@/components/ConfirmModal';
+import ImageWithFallback from '@/components/ImageWithFallback';
 
 // ============================================
 // Admin - Panel de gestion centralizada
@@ -39,6 +41,7 @@ export default function AdminPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [editingCategoria, setEditingCategoria] = useState(null);
   const [editingDesarrolladora, setEditingDesarrolladora] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null); // { type: 'game'|'user'|'categoria'|'desarrolladora'|'review', item }
   const [showSeedPrompt, setShowSeedPrompt] = useState(false);
 
   // Form states
@@ -142,7 +145,6 @@ export default function AdminPage() {
   };
 
   const deleteGame = async (game) => {
-    if (!confirm('Eliminar "' + game.titulo + '" del inventario?')) return;
     try {
       const res = await fetch('/api/juegos/' + game._id, { method: 'DELETE' });
       if (res.ok) { showToast('"' + game.titulo + '" eliminado.', 'error'); fetchData(); }
@@ -197,7 +199,6 @@ export default function AdminPage() {
   };
 
   const deleteUser = async (u) => {
-    if (!confirm('Eliminar usuario "' + u.username + '"?')) return;
     try {
       const res = await fetch('/api/usuarios/' + u._id, { method: 'DELETE' });
       if (res.ok) { showToast('Usuario "' + u.username + '" eliminado.', 'error'); fetchData(); }
@@ -254,7 +255,6 @@ export default function AdminPage() {
   };
 
   const deleteCategoria = async (c) => {
-    if (!confirm('Eliminar categoria "' + c.nombre + '"?')) return;
     try {
       const res = await fetch('/api/categorias/' + c._id, { method: 'DELETE' });
       if (res.ok) { showToast('Categoria "' + c.nombre + '" eliminada.', 'error'); fetchData(); }
@@ -307,7 +307,6 @@ export default function AdminPage() {
   };
 
   const deleteDesarrolladora = async (d) => {
-    if (!confirm('Eliminar desarrolladora "' + d.nombre + '"?')) return;
     try {
       const res = await fetch('/api/desarrolladoras/' + d._id, { method: 'DELETE' });
       if (res.ok) { showToast('Desarrolladora "' + d.nombre + '" eliminada.', 'error'); fetchData(); }
@@ -336,11 +335,23 @@ export default function AdminPage() {
   // ═════════════════════════════════════════════════════
 
   const deleteReview = async (review) => {
-    if (!confirm('Eliminar resena de "' + review.autor + '"?')) return;
     try {
       const res = await fetch('/api/resenas/' + review._id, { method: 'DELETE' });
       if (res.ok) { showToast('Resena de "' + review.autor + '" eliminada.', 'error'); fetchData(); }
     } catch (err) { showToast('Error al eliminar resena.', 'error'); }
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDelete) return;
+    const { type, item } = confirmDelete;
+    try {
+      if (type === 'game') await deleteGame(item);
+      else if (type === 'user') await deleteUser(item);
+      else if (type === 'categoria') await deleteCategoria(item);
+      else if (type === 'desarrolladora') await deleteDesarrolladora(item);
+      else if (type === 'review') await deleteReview(item);
+    } catch (err) { showToast('Error al eliminar.', 'error'); }
+    setConfirmDelete(null);
   };
 
   // ═════════════════════════════════════════════════════
@@ -366,12 +377,23 @@ export default function AdminPage() {
   // RENDER
   // ═════════════════════════════════════════════════════
 
-  if (authLoading || (!user && !authLoading)) {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <span className="material-symbols-outlined text-5xl text-primary animate-pulse">sync</span>
-          <p className="text-on-surface-variant mt-4">{authLoading ? 'Cargando...' : 'Redirigiendo al login...'}</p>
+          <p className="text-on-surface-variant mt-4">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <span className="material-symbols-outlined text-5xl text-primary animate-pulse">sync</span>
+          <p className="text-on-surface-variant mt-4">Redirigiendo al login...</p>
         </div>
       </div>
     );
@@ -389,11 +411,18 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <span className="material-symbols-outlined text-5xl text-primary animate-pulse">sync</span>
-          <p className="text-on-surface-variant mt-4">Cargando panel de administracion...</p>
+      <div className="animate-pulse space-y-6 mt-lg">
+        <div className="h-8 w-64 bg-surface-variant rounded"></div>
+        <div className="flex gap-4">
+          {[1, 2, 3].map(i => <div key={i} className="h-24 w-32 bg-surface-variant rounded-xl"></div>)}
         </div>
+        <div className="h-64 bg-surface-variant rounded-xl"></div>
+        <div className="h-64 bg-surface-variant rounded-xl"></div>
+        <div className="grid grid-cols-2 gap-6">
+          <div className="h-48 bg-surface-variant rounded-xl"></div>
+          <div className="h-48 bg-surface-variant rounded-xl"></div>
+        </div>
+        <div className="h-48 bg-surface-variant rounded-xl"></div>
       </div>
     );
   }
@@ -473,10 +502,10 @@ export default function AdminPage() {
                 {games.map((g) => (
                   <tr key={g._id} className="hover:bg-surface-container-high/30 transition-colors group">
                     <td className="py-4 px-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-surface-container-high flex-shrink-0 flex items-center justify-center" style={{ border: '1px solid ' + (catColors[g.categoria] || '#4d4354') + '30' }}>
-                          <span className="material-symbols-outlined text-sm" style={{ color: catColors[g.categoria] || '#cfc2d6' }}>sports_esports</span>
-                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style={{ border: '1px solid ' + (catColors[g.categoria] || '#4d4354') + '30' }}>
+                            <ImageWithFallback src={g.imagen} alt={g.titulo} className="w-full h-full object-cover" fallbackIcon="sports_esports" />
+                          </div>
                         <div>
                           <span className="text-body-md font-body-md text-on-surface font-medium group-hover:text-primary transition-colors">{g.titulo}</span>
                           {g.descripcion && <p className="text-label-sm font-label-sm text-on-surface-variant truncate max-w-[200px]">{g.descripcion}</p>}
@@ -494,7 +523,7 @@ export default function AdminPage() {
                         <button onClick={() => openEditGame(g)} className="inline-flex items-center gap-2 px-3 py-2 border border-secondary/50 text-secondary rounded-lg hover:bg-secondary/10 hover:border-secondary transition-all text-label-sm font-label-sm uppercase">
                           <span className="material-symbols-outlined text-[16px]">edit</span> Editar
                         </button>
-                        <button onClick={() => deleteGame(g)} className="inline-flex items-center gap-2 px-3 py-2 border border-error/30 text-error rounded-lg hover:bg-error/10 hover:border-error transition-all text-label-sm font-label-sm uppercase">
+                        <button onClick={() => setConfirmDelete({ type: 'game', item: g })} className="inline-flex items-center gap-2 px-3 py-2 border border-error/30 text-error rounded-lg hover:bg-error/10 hover:border-error transition-all text-label-sm font-label-sm uppercase">
                           <span className="material-symbols-outlined text-[16px]">delete</span>
                         </button>
                       </div>
@@ -565,7 +594,7 @@ export default function AdminPage() {
                           <button onClick={() => openEditUser(u)} className="inline-flex items-center gap-2 px-3 py-2 border border-secondary/50 text-secondary rounded-lg hover:bg-secondary/10 transition-all text-label-sm font-label-sm uppercase">
                             <span className="material-symbols-outlined text-[16px]">edit</span> Rol
                           </button>
-                          <button onClick={() => deleteUser(u)} className="inline-flex items-center gap-2 px-3 py-2 border border-error/30 text-error rounded-lg hover:bg-error/10 transition-all text-label-sm font-label-sm uppercase">
+                          <button onClick={() => setConfirmDelete({ type: 'user', item: u })} className="inline-flex items-center gap-2 px-3 py-2 border border-error/30 text-error rounded-lg hover:bg-error/10 transition-all text-label-sm font-label-sm uppercase">
                             <span className="material-symbols-outlined text-[16px]">delete</span>
                           </button>
                         </div>
@@ -617,7 +646,7 @@ export default function AdminPage() {
                           <button onClick={() => openEditCategoria(c)} className="p-2 text-on-surface-variant hover:text-secondary transition-colors" title="Editar">
                             <span className="material-symbols-outlined text-sm">edit</span>
                           </button>
-                          <button onClick={() => deleteCategoria(c)} className="p-2 text-on-surface-variant hover:text-error transition-colors" title="Eliminar">
+                          <button onClick={() => setConfirmDelete({ type: 'categoria', item: c })} className="p-2 text-on-surface-variant hover:text-error transition-colors" title="Eliminar">
                             <span className="material-symbols-outlined text-sm">delete</span>
                           </button>
                         </div>
@@ -657,7 +686,7 @@ export default function AdminPage() {
                           <button onClick={() => openEditDesarrolladora(d)} className="p-2 text-on-surface-variant hover:text-secondary transition-colors" title="Editar">
                             <span className="material-symbols-outlined text-sm">edit</span>
                           </button>
-                          <button onClick={() => deleteDesarrolladora(d)} className="p-2 text-on-surface-variant hover:text-error transition-colors" title="Eliminar">
+                          <button onClick={() => setConfirmDelete({ type: 'desarrolladora', item: d })} className="p-2 text-on-surface-variant hover:text-error transition-colors" title="Eliminar">
                             <span className="material-symbols-outlined text-sm">delete</span>
                           </button>
                         </div>
@@ -719,7 +748,7 @@ export default function AdminPage() {
                       </td>
                       <td className="py-4 px-6"><p className="text-body-md font-body-md text-on-surface-variant italic truncate max-w-xs">"{r.comentario}"</p></td>
                       <td className="py-4 px-6 text-right">
-                        <button onClick={() => deleteReview(r)} className="inline-flex items-center gap-2 px-3 py-2 border border-error/40 text-error rounded-lg hover:bg-error/10 hover:border-error transition-all text-label-sm font-label-sm uppercase">
+                        <button onClick={() => setConfirmDelete({ type: 'review', item: r })} className="inline-flex items-center gap-2 px-3 py-2 border border-error/40 text-error rounded-lg hover:bg-error/10 hover:border-error transition-all text-label-sm font-label-sm uppercase">
                           <span className="material-symbols-outlined text-[16px]">delete</span> Eliminar
                         </button>
                       </td>
@@ -1107,6 +1136,24 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+
+      {/* ── Confirm Delete Modal ── */}
+      <ConfirmModal
+        isOpen={confirmDelete !== null}
+        title={'Eliminar ' + (confirmDelete?.type === 'game' ? 'Juego' : confirmDelete?.type === 'user' ? 'Usuario' : confirmDelete?.type === 'categoria' ? 'Categoria' : confirmDelete?.type === 'desarrolladora' ? 'Desarrolladora' : 'Resena')}
+        message={
+          confirmDelete?.type === 'game' ? 'Esta seguro de eliminar "' + confirmDelete?.item?.titulo + '" del inventario?' :
+          confirmDelete?.type === 'user' ? 'Esta seguro de eliminar al usuario "' + confirmDelete?.item?.username + '"?' :
+          confirmDelete?.type === 'categoria' ? 'Esta seguro de eliminar la categoria "' + confirmDelete?.item?.nombre + '"?' :
+          confirmDelete?.type === 'desarrolladora' ? 'Esta seguro de eliminar la desarrolladora "' + confirmDelete?.item?.nombre + '"?' :
+          'Esta seguro de eliminar la resena de "' + confirmDelete?.item?.autor + '"?' + ' Esta accion no se puede deshacer.'
+        }
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmDelete(null)}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        danger={true}
+      />
     </>
   );
 }

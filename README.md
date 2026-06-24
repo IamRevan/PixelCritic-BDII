@@ -170,6 +170,34 @@ Juegos con precio > $50 (operador $gt) ordenados de mayor a menor:
 
 **Nota:** Si la base de datos esta vacia, el CLI la pobla automaticamente con 17 juegos, usuarios, categorias, desarrolladoras y resenas. Si ya tiene datos (por ejemplo, porque usaste la web antes), los conserva y solo agrega 2 juegos temporales para la demostracion.
 
+### Script de Prueba de Conexion MongoDB
+
+Para verificar rapidamente que MongoDB esta accesible y listar las bases de datos/colecciones disponibles:
+
+```bash
+node test-mongo.js
+```
+
+Salida esperada:
+
+```
+Conectando a: mongodb://127.0.0.1:27017
+Conexion exitosa!
+Version de MongoDB: 7.0.0
+
+Bases de datos disponibles:
+  - admin (0.00 MB)
+  - PixelCriticDB (0.50 MB)
+  - local (0.00 MB)
+
+Colecciones en PixelCriticDB:
+  - usuarios (6 documentos)
+  - categorias (6 documentos)
+  - desarrolladoras (14 documentos)
+  - juegos (17 documentos)
+  - resenas (18 documentos)
+```
+
 ### 5. Ejecutar la Aplicacion Web (Next.js)
 
 Para iniciar el servidor web con interfaz grafica:
@@ -199,17 +227,20 @@ npm run web
 
 ## Paginas de la Aplicacion Web
 
-- `/` - Catalogo de juegos con busqueda, filtros por categoria y ordenamiento por precio
-- `/juego/[id]` - Pagina de detalle del juego con formulario para dejar resenas
+- `/` - Catalogo de juegos con busqueda, filtros por categoria y ordenamiento multiple (precio, nombre, rating, año)
+- `/juego/[id]` - Pagina de detalle del juego con formulario para dejar/editar resenas
 - `/admin` - Panel de administracion protegido (solo admin/editor) con CRUD completo
-- `/premium` - Juegos con calificacion >= 4, resenas destacadas y metricas
-- `/login` - Pagina de inicio de sesion
+- `/perfil` - Perfil del usuario con todas sus resenas (editar/eliminar)
+- `/premium` - Juegos favoritos del equipo, resenas destacadas y metricas
+- `/login` - Pagina de inicio de sesion con toggle de visibilidad de contrasena
+- `/*` - Pagina 404 personalizada
 
 ## Estructura del Proyecto
 
 ```
 PixelCritic-TecnoCapibara/
   index.js                  - Modulo CRUD en Node.js (CLI) - punto de entrada npm start
+  test-mongo.js             - Script de prueba de conexion a MongoDB
   package.json              - Configuracion del proyecto y dependencias
   .env                      - Variables de entorno (NO subir a GitHub)
   .gitignore                - Archivos ignorados por Git
@@ -231,6 +262,9 @@ PixelCritic-TecnoCapibara/
         page.js             - Pagina de inicio de sesion con credenciales visibles
       admin/
         page.js             - Panel de administracion con CRUD completo
+      perfil/
+        page.js             - Pagina de perfil del usuario con sus resenas
+      not-found.js          - Pagina 404 personalizada
       premium/
         page.js             - Pagina de juegos premium (calificacion >= 4)
       juego/
@@ -255,7 +289,13 @@ PixelCritic-TecnoCapibara/
           [id]/route.js     - PUT: actualizar desarrolladora, DELETE: eliminar
         resenas/
           route.js          - GET: listar resenas, POST: crear resena
-          [id]/route.js     - DELETE: eliminar resena
+          [id]/route.js     - PUT: actualizar resena, DELETE: eliminar resena
+    components/
+      ConfirmModal.js       - Modal de confirmacion reutilizable para eliminaciones
+      ImageWithFallback.js  - Componente de imagen con fallback en caso de error
+      SkeletonCard.js       - Esqueletos de carga para catalogos (GameCard, Premium, Detail)
+    hooks/
+      useDebounce.js        - Hook para debounce en busquedas (300ms)
     context/
       AuthContext.js        - Contexto de autenticacion (login/logout, localStorage)
     lib/

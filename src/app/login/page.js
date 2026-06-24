@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -84,14 +85,26 @@ export default function LoginPage() {
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Contrasena</label>
-            <input
-              className="input-cyber w-full py-2 text-body-md font-body-md text-on-surface"
-              placeholder="Ingresa tu contrasena"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              type="password"
-            />
+            <div className="relative">
+              <input
+                className="input-cyber w-full py-2 pr-10 text-body-md font-body-md text-on-surface"
+                placeholder="Ingresa tu contrasena"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                type={showPassword ? 'text' : 'password'}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors p-1"
+                tabIndex={-1}
+              >
+                <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {showPassword ? 'visibility_off' : 'visibility'}
+                </span>
+              </button>
+            </div>
           </div>
           <button
             type="submit"

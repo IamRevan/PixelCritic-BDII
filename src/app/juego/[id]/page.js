@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import ImageWithFallback from '@/components/ImageWithFallback';
+import { DetailSkeleton } from '@/components/SkeletonCard';
 
 // ============================================
 // Detalle del Juego - Pagina individual
@@ -33,6 +35,11 @@ export default function GameDetailPage() {
   const [reviewForm, setReviewForm] = useState({ calificacion: 5, comentario: '' });
   const [submitting, setSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState('');
+
+  // Estado del modal de editar resena
+  const [editingReview, setEditingReview] = useState(null);
+  const [editReviewForm, setEditReviewForm] = useState({ calificacion: 5, comentario: '' });
+  const [editSubmitting, setEditSubmitting] = useState(false);
 
   const loadData = async () => {
     try {
@@ -89,6 +96,34 @@ export default function GameDetailPage() {
     }
   };
 
+  const handleEditReview = async (e) => {
+    e.preventDefault();
+    if (!editingReview) return;
+    setEditSubmitting(true);
+    try {
+      const res = await fetch('/api/resenas/' + editingReview._id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          calificacion: editReviewForm.calificacion,
+          comentario: editReviewForm.comentario.trim(),
+        }),
+      });
+      if (res.ok) {
+        showToast('Resena actualizada exitosamente.');
+        setEditingReview(null);
+        loadData();
+      } else {
+        const errData = await res.json();
+        showToast(errData.error || 'Error al actualizar resena.', 'error');
+      }
+    } catch (err) {
+      showToast('Error de conexion.', 'error');
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
+
   function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -105,14 +140,7 @@ export default function GameDetailPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <span className="material-symbols-outlined text-5xl text-primary animate-pulse">sync</span>
-          <p className="text-on-surface-variant mt-4">Cargando detalle del juego...</p>
-        </div>
-      </div>
-    );
+    return <DetailSkeleton />;
   }
 
   if (error || !game) {
@@ -139,11 +167,7 @@ export default function GameDetailPage() {
 
       <div className="glass-panel rounded-2xl overflow-hidden border-primary/20">
         <div className="relative h-48 md:h-64 bg-surface-container-high flex items-center justify-center">
-          {game.imagen ? (
-            <img src={game.imagen} alt={game.titulo} className="w-full h-full object-cover" />
-          ) : (
-            <span className="material-symbols-outlined text-8xl text-outline-variant opacity-30" style={{fontVariationSettings:"'FILL' 1", fontSize: '120px'}}>sports_esports</span>
-          )}
+          <ImageWithFallback src={game.imagen} alt={game.titulo} className="w-full h-full object-cover" fallbackIcon="sports_esports" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent"></div>
           <div className="absolute bottom-4 right-4 bg-surface/90 backdrop-blur-md border border-secondary/30 rounded-xl px-4 py-2 flex items-center gap-2">
             <span className="material-symbols-outlined text-secondary" style={{fontVariationSettings:"'FILL' 1"}}>star</span>
@@ -286,26 +310,80 @@ export default function GameDetailPage() {
             {reviews.map((r, i) => {
               const reviewColors = { 5: '#4ae176', 4: '#ddb7ff', 3: '#ffd54f', 2: '#ff8a65', 1: '#ef5350' };
               return (
-                <div key={r._id || i} className="glass-panel rounded-xl p-5 review-card" style={{ borderLeftColor: reviewColors[r.calificacion] || '#4d4354' }}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-primary text-sm" style={{fontVariationSettings:"'FILL' 1"}}>person</span>
+                  <div key={r._id || i} className="glass-panel rounded-xl p-5 review-card relative group" style={{ borderLeftColor: reviewColors[r.calificacion] || '#4d4354' }}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
+                          <span className="material-symbols-outlined text-primary text-sm" style={{fontVariationSettings:"'FILL' 1"}}>person</span>
+                        </div>
+                        <div>
+                          <p className="text-body-md font-body-md text-on-surface font-semibold">{r.autor}</p>
+                          <div className="flex items-center gap-1" dangerouslySetInnerHTML={{ __html: getStars(r.calificacion) }}></div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-body-md font-body-md text-on-surface font-semibold">{r.autor}</p>
-                        <div className="flex items-center gap-1" dangerouslySetInnerHTML={{ __html: getStars(r.calificacion) }}></div>
+                      <div className="flex items-center gap-2">
+                        {(user && (user.username === r.autor || user.rol === 'admin')) && (
+                          <button onClick={() => { setEditingReview(r); setEditReviewForm({ calificacion: r.calificacion, comentario: r.comentario }); }} className="text-on-surface-variant hover:text-secondary transition-colors p-1" title="Editar resena">
+                            <span className="material-symbols-outlined text-sm">edit</span>
+                          </button>
+                        )}
+                        <span className="text-label-sm font-label-sm font-bold" style={{ color: reviewColors[r.calificacion] || '#4ae176' }}>{r.calificacion}.0</span>
                       </div>
                     </div>
-                    <span className="text-label-sm font-label-sm font-bold" style={{ color: reviewColors[r.calificacion] || '#4ae176' }}>{r.calificacion}.0</span>
+                    <p className="text-body-md font-body-md text-on-surface-variant italic leading-relaxed">"{r.comentario}"</p>
                   </div>
-                  <p className="text-body-md font-body-md text-on-surface-variant italic leading-relaxed">"{r.comentario}"</p>
-                </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {/* ── Edit Review Modal ── */}
+      {editingReview && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setEditingReview(null)}></div>
+          <div className="glass-panel modal-show relative w-full max-w-md rounded-2xl shadow-2xl border border-secondary/20 flex flex-col overflow-hidden">
+            <div className="p-md border-b border-outline-variant/30 flex justify-between items-center bg-surface-container/50">
+              <h3 className="text-headline-md font-headline-md text-secondary font-bold">Editar Resena</h3>
+              <button onClick={() => setEditingReview(null)} className="text-on-surface-variant hover:text-error transition-colors"><span className="material-symbols-outlined">close</span></button>
+            </div>
+            <form onSubmit={handleEditReview} className="p-md flex flex-col gap-5">
+              <div className="flex flex-col gap-2">
+                <label className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Calificacion</label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setEditReviewForm({...editReviewForm, calificacion: star})}
+                      className={'p-1 rounded-lg transition-all hover:scale-110 ' + (star <= editReviewForm.calificacion ? 'text-secondary' : 'text-outline-variant')}
+                    >
+                      <span className="material-symbols-outlined text-3xl" style={{fontVariationSettings: "'FILL' " + (star <= editReviewForm.calificacion ? 1 : 0)}}>star</span>
+                    </button>
+                  ))}
+                  <span className="text-body-lg font-body-lg text-secondary font-bold ml-2">{editReviewForm.calificacion}.0 / 5.0</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Comentario</label>
+                <textarea
+                  className="input-cyber w-full py-2 text-body-md font-body-md text-on-surface min-h-[100px] resize-none"
+                  placeholder="Escribe tu opinion sobre este juego..."
+                  value={editReviewForm.comentario}
+                  onChange={e => setEditReviewForm({...editReviewForm, comentario: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-4 border-t border-outline-variant/30 pt-4">
+                <button type="button" onClick={() => setEditingReview(null)} className="px-6 py-2 border border-outline-variant text-on-surface-variant rounded-lg font-label-sm text-label-sm uppercase hover:bg-surface-variant/30">Cancelar</button>
+                <button type="submit" disabled={editSubmitting} className="bg-secondary text-on-secondary hover:bg-secondary/80 px-6 py-2 rounded-lg font-label-sm text-label-sm uppercase transition-all shadow-[0_0_15px_rgba(74,225,118,0.2)] disabled:opacity-50 flex items-center gap-2">
+                  {editSubmitting ? <><span className="material-symbols-outlined animate-spin text-sm">sync</span> Guardando...</> : 'Guardar Cambios'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import ImageWithFallback from '@/components/ImageWithFallback';
+import { PremiumCardSkeleton } from '@/components/SkeletonCard';
+import { useDebounce } from '@/hooks/useDebounce';
 
 // ============================================
 // Favoritos del Equipo - Pagina Premium
@@ -26,6 +29,7 @@ export default function PremiumPage() {
   const [loading, setLoading] = useState(true);
   const [currentFilter, setCurrentFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 300);
 
   const fetchData = useCallback(async () => {
     try {
@@ -64,7 +68,7 @@ export default function PremiumPage() {
   // Filtros
   const filteredFavorites = favoriteWithRating
     .filter(g => currentFilter === 'Todos' || g.categoria === currentFilter)
-    .filter(g => g.titulo.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(g => g.titulo.toLowerCase().includes(debouncedSearch.toLowerCase()))
     .sort((a, b) => (b.calificacionDinamica || 0) - (a.calificacionDinamica || 0));
 
   // Resenas destacadas (calificacion >= 4)
@@ -110,11 +114,12 @@ export default function PremiumPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <span className="material-symbols-outlined text-5xl text-primary animate-pulse">sync</span>
-          <p className="text-on-surface-variant mt-4">Cargando favoritos...</p>
-        </div>
+      <div className="mt-lg">
+        <div className="h-10 w-64 bg-surface-variant rounded animate-pulse mb-lg"></div>
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md lg:gap-gutter mt-lg">
+          <PremiumCardSkeleton featured={true} />
+          {Array.from({ length: 4 }).map((_, i) => <PremiumCardSkeleton key={i} />)}
+        </section>
       </div>
     );
   }
@@ -187,13 +192,7 @@ export default function PremiumPage() {
                     <span className="bg-surface-container/80 text-on-surface text-label-sm font-label-sm px-3 py-1 rounded-full backdrop-blur-md">{g.categoria}</span>
                   </div>
                   <div className="w-full md:w-3/5 min-h-[220px] md:min-h-full relative overflow-hidden bg-surface-container-high">
-                    {g.imagen ? (
-                      <img src={g.imagen} alt={g.titulo} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-symbols-outlined text-6xl text-outline-variant">sports_esports</span>
-                      </div>
-                    )}
+                    <ImageWithFallback src={g.imagen} alt={g.titulo} className="w-full h-full object-cover" fallbackIcon="sports_esports" />
                     <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-surface/30 md:to-surface"></div>
                   </div>
                   <div className="w-full md:w-2/5 p-lg flex flex-col justify-center bg-surface md:bg-transparent">
@@ -228,13 +227,7 @@ export default function PremiumPage() {
                   </div>
                 </div>
                 <div className="h-1/2 relative overflow-hidden bg-surface-container-high">
-                  {g.imagen ? (
-                    <img src={g.imagen} alt={g.titulo} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="material-symbols-outlined text-5xl text-outline-variant">sports_esports</span>
-                    </div>
-                  )}
+                  <ImageWithFallback src={g.imagen} alt={g.titulo} className="w-full h-full object-cover" fallbackIcon="sports_esports" />
                   <div className="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent"></div>
                 </div>
                 <div className="h-1/2 p-md flex flex-col bg-surface-container relative">

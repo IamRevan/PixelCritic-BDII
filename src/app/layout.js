@@ -21,6 +21,7 @@ function NavBar({ children }) {
     { href: "/", label: "Catalogo", icon: "grid_view" },
     { href: "/admin", label: "Administracion", icon: "settings_applications" },
     { href: "/premium", label: "Favoritos del Equipo", icon: "workspace_premium" },
+    { href: "/perfil", label: "Mi Perfil", icon: "account_circle" },
   ];
 
   const isActive = (href) => {
